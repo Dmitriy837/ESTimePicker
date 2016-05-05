@@ -129,7 +129,6 @@
 {
     _ESTimePickerLineView *_lineView;
     BOOL _shouldMoveBack;
-    UIView *_midDot;
     UIButton *_amButton;
     BOOL _pm;
     UIButton *_pmButton;
@@ -247,10 +246,6 @@ static double const kAnimationSpeed = 0.25f;
     _container = [[UIView alloc] initWithFrame:self.bounds];
     [self addSubview:_container];
     mrcRelease(_container);
-    
-    _midDot = [[UIView alloc] init];
-    [self addSubview:_midDot];
-    mrcRelease(_midDot);
     
     // AM/PM
     [self addSubview:_amButton];
@@ -398,7 +393,6 @@ static double const kAnimationSpeed = 0.25f;
 #if !__has_feature(objc_arc)
     [_selectColor retain];
 #endif
-    [_midDot setBackgroundColor:_selectColor];
 }
 
 - (void)setHighlightColor:(UIColor *)highlightColor
@@ -461,7 +455,6 @@ static double const kAnimationSpeed = 0.25f;
         return;
     }
     
-    [_midDot setHidden:YES];
     _animating = YES;
     [_lineView setHidden:YES];
     UIGraphicsBeginImageContextWithOptions(_container.bounds.size, NO, 0.0);
@@ -538,11 +531,6 @@ static double const kAnimationSpeed = 0.25f;
     const CGFloat widthHeight = 40;
     const CGFloat padding = widthHeight / 2;
     
-    CGRect r = _midDot.frame;
-    r.size.width =
-    r.size.height = widthHeight / 4;
-    [_midDot setFrame:r];
-    _midDot.layer.cornerRadius = widthHeight / 8;
     CGFloat radius = (CGRectGetWidth(self.bounds) - widthHeight - 5) / 2.0f;
     CGFloat centerX = CGRectGetMidX(self.bounds);
     CGFloat centerY = CGRectGetMidX(self.bounds);
@@ -620,7 +608,7 @@ static double const kAnimationSpeed = 0.25f;
         mrcRelease(lbl);
         if (i == 11 && self.type == ESTimePickerTypeHours) {
             ringNumber = 1;
-            radius *= 0.7;
+            radius *= 0.6;
         }
     }
     
@@ -705,9 +693,7 @@ static double const kAnimationSpeed = 0.25f;
 
 - (void)_touch:(CGPoint)point
 {
-    [_midDot setHidden:YES];
     if (_animating) { return; }
-    [_midDot setHidden:NO];
     [_lineView setHidden:NO];
     [_lineView setNeedsDisplay];
     _ESTimePickerUILabel *lbl = nil;
@@ -759,16 +745,10 @@ static double const kAnimationSpeed = 0.25f;
 
 - (void)_positionTo:(_ESTimePickerUILabel *)lbl
 {
-    [_midDot setHidden:NO];
     [_lineView setHidden:NO];
     [_container sendSubviewToBack:lbl];
     CGPoint p = CGPointMake(CGRectGetMidX(lbl.frame), CGRectGetMidY(lbl.frame));
     [_lineView setPosition:p];
-    CGRect r = _midDot.frame;
-    r.origin.x = p.x - (r.size.width / 2);
-    r.origin.y = p.y - (r.size.height / 2);
-    [_midDot setFrame:r];
-    [_midDot setBackgroundColor:self.selectColor];
     [lbl setBackgroundColor:self.highlightColor];
 }
 
